@@ -6,7 +6,7 @@ use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
-use pmill\AwsCognito\CognitoClient;
+use pmill\LaravelAwsCognito\LaravelCognitoClient;
 use pmill\AwsCognito\Exception\TokenExpiryException;
 use pmill\AwsCognito\Exception\TokenVerificationException;
 use pmill\LaravelAwsCognito\Exceptions\CognitoUserNotFoundException;
@@ -29,6 +29,11 @@ class ApiGuard implements Guard
      * @var AuthenticationResponse
      */
     protected $authenticationResponse;
+    
+    /**
+     * @var cognitoAuthenticationResponse
+     */
+    protected $cognitoAuthenticationResponse;
 
     /**
      * ApiGuard constructor.
@@ -36,7 +41,7 @@ class ApiGuard implements Guard
      * @param UserProvider $userProvider
      * @param CognitoClient $cognitoClient
      */
-    public function __construct(UserProvider $userProvider, CognitoClient $cognitoClient)
+    public function __construct(UserProvider $userProvider, LaravelCognitoClient $cognitoClient)
     {
         $this->provider = $userProvider;
         $this->cognitoClient = $cognitoClient;
@@ -96,7 +101,8 @@ class ApiGuard implements Guard
         $authenticationResponse->setIdToken(array_get($cognitoAuthenticationResponse, 'IdToken'));
         $authenticationResponse->setRefreshToken(array_get($cognitoAuthenticationResponse, 'RefreshToken'));
         $authenticationResponse->setTokenType(array_get($cognitoAuthenticationResponse, 'TokenType'));
-
+        
+        $this->cognitoAuthenticationResponse = $cognitoAuthenticationResponse;
         return $this->authenticationResponse = $authenticationResponse;
     }
 
@@ -142,7 +148,8 @@ class ApiGuard implements Guard
         $this->user = $this->provider->retrieveByCredentials([
             'username' => $cognitoUsername,
         ]);
-
+        
+        $this->cognitoAuthenticationResponse = $cognitoAuthenticationResponse;
         return $this->authenticationResponse = $authenticationResponse;
     }
 
@@ -152,5 +159,20 @@ class ApiGuard implements Guard
     public function authenticationResponse()
     {
         return $this->authenticationResponse;
+    }
+    
+    /**
+     * @return AuthenticationResponse
+     */
+    public function cognitoAuthenticationResponse()
+    {
+        return $this->cognitoAuthenticationResponse;
+    }
+    
+    /**
+     * @return aws user
+     */
+    public function getUser(){
+        return $this->cognitoClient->getUser($this->cognitoAuthenticationResponse['AccessToken']);
     }
 }

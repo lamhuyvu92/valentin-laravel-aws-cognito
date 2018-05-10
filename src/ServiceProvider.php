@@ -5,7 +5,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
-use pmill\AwsCognito\CognitoClient;
+use pmill\LaravelAwsCognito\LaravelCognitoClient;
 use Psr\Cache\CacheItemPoolInterface;
 
 class ServiceProvider extends AuthServiceProvider
@@ -25,10 +25,10 @@ class ServiceProvider extends AuthServiceProvider
             return new \Aws\Sdk(config('aws-cognito-auth'));
         });
 
-        $this->app->singleton(CognitoClient::class, function (Application $app) {
+        $this->app->singleton(LaravelCognitoClient::class, function (Application $app) {
             $awsCognitoIdentityProvider = $app->make('aws-cognito-sdk')->createCognitoIdentityProvider();
 
-            $cognitoClient = new CognitoClient($awsCognitoIdentityProvider);
+            $cognitoClient = new LaravelCognitoClient($awsCognitoIdentityProvider);
             $cognitoClient->setAppClientId(config('aws-cognito-auth.app_client_id'));
             $cognitoClient->setAppClientSecret(config('aws-cognito-auth.app_client_secret'));
             $cognitoClient->setRegion(config('aws-cognito-auth.region'));
@@ -38,7 +38,7 @@ class ServiceProvider extends AuthServiceProvider
         });
 
         $this->app['auth']->extend('aws-cognito', function (Application $app, $name, array $config) {
-            $client = $app->make(CognitoClient::class);
+            $client = $app->make(LaravelCognitoClient::class);
             $provider = $app['auth']->createUserProvider($config['provider']);
 
             return new ApiGuard($provider, $client);
