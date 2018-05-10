@@ -1,0 +1,21 @@
+{
+  "name": "pmill/laravel-aws-cognito",
+  "description": "A Laravel guard for AWS Cognito user pools",
+  "keywords": ["laravel", "guard", "php", "authentication", "aws", "cognito", "api"],
+  "homepage": "https://github.com/pmill/laravel-aws-cognito",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "pmill",
+      "email": "dev.pmill@gmail.com"
+    }
+  ],
+  "require": {
+    "illuminate/support": "^5.4",
+    "laravel/framework": "^5.4",
+    "pmill/aws-cognito": "^0.2.1"
+  },
+  "autoload": {
+    "psr-4": {"pmill\\LaravelAwsCognito\\": "src/"}
+  }
+}
