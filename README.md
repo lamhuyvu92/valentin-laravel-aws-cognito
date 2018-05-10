@@ -27,7 +27,7 @@ curl -sS https://getcomposer.org/installer | php
 Next, run the Composer command to install the latest version:
 
 ```bash
-composer.phar require lamhuyvu92/valentin-laravel-aws-cognito
+composer global require lamhuyvu92/valentin-laravel-aws-cognito:dev-master
 ```
 
 Usage
