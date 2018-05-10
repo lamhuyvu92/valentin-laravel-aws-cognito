@@ -1,13 +1,13 @@
 {
-  "name": "pmill/laravel-aws-cognito",
+  "name": "lamhuyvu92/valentin-laravel-aws-cognito",
   "description": "A Laravel guard for AWS Cognito user pools",
   "keywords": ["laravel", "guard", "php", "authentication", "aws", "cognito", "api"],
-  "homepage": "https://github.com/pmill/laravel-aws-cognito",
+  "homepage": "https://github.com/lamhuyvu92/valentin-laravel-aws-cognito",
   "license": "MIT",
   "authors": [
     {
-      "name": "pmill",
-      "email": "dev.pmill@gmail.com"
+      "name": "lamhuyvu92",
+      "email": "lamhuyvu92@gmail.com"
     }
   ],
   "require": {
