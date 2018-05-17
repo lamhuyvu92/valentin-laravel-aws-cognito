@@ -77,12 +77,13 @@ class ApiGuard implements Guard
     /**
      * @return bool
      */
-    public function validateToken()
+    public function validateToken($accessToken = null)
     {
-        $authorizationHeader = request()->header('Authorization');
-        $accessToken = trim(str_replace('Bearer', '', $authorizationHeader));
-        $this->attemptWithToken($accessToken);
-        return $this->check();
+        if(!$accessToken){
+            $authorizationHeader = request()->header('Authorization');
+            $accessToken = trim(str_replace('Bearer', '', $authorizationHeader));
+        }
+        return $this->attemptWithToken($accessToken);
     }
 
     /**
@@ -123,6 +124,10 @@ class ApiGuard implements Guard
         $this->user = $this->provider->retrieveByCredentials([
             'username' => $cognitoUsername,
         ]);
+        if($cognitoUsername){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -172,7 +177,33 @@ class ApiGuard implements Guard
     /**
      * @return aws user
      */
-    public function getUser(){
-        return $this->cognitoClient->getUser($this->cognitoAuthenticationResponse['AccessToken']);
+    public function getUser($accessToken = null){
+        if($accessToken && $this->validateToken($accessToken)){
+            return $this->cognitoClient->getUser($accessToken);
+        }else{
+            return null;
+        }
+    }
+    
+    /**
+     * @param string $username
+     * @param string $password
+     * @param array $attributes
+     * @return string
+     * @throws Exception
+     */
+    public function registerUser($request = null)
+    {
+        $username = $request['username'];
+        $password = $request['password'];
+        unset($request['username']);
+        unset($request['password']);
+        unset($request['password_confirmation']);
+        return $this->cognitoClient->registerUser($username, $password, $request);
+    }
+    
+    public function confirmUserRegistration($confirmationCode, $username)
+    {
+        $this->cognitoClient->confirmUserRegistration($confirmationCode, $username);
     }
 }
