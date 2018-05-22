@@ -206,4 +206,25 @@ class ApiGuard implements Guard
     {
         $this->cognitoClient->confirmUserRegistration($confirmationCode, $username);
     }
+    
+    public function UpdateUserAttributes($access_token, $attributes)
+    {
+        $this->cognitoClient->UpdateUserAttributes($access_token, $attributes);
+    }
+    
+    public function changePassword($access_token, $current_password, $new_password){
+        $this->cognitoClient->changePassword($access_token, $current_password, $new_password);
+    }
+    
+    public function sendForgottenPasswordRequest($username){
+        $this->cognitoClient->sendForgottenPasswordRequest($username);
+    }
+    
+    public function resetPassword($confirmationCode, $username, $proposedPassword){
+        $this->cognitoClient->resetPassword($confirmationCode, $username, $proposedPassword);
+    }
+    
+    public function test(){
+        $this->cognitoClient->test();
+    }
 }
