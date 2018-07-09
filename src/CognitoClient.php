@@ -24,7 +24,7 @@ class LaravelCognitoClient extends CognitoClient
         }
 	}
 	
-	public function UpdateUserAttributes($access_token, $attributes)
+	public function UpdateUserAttributes($access_token, array $attributes = [])
 	{
 		try {
 			$this->client->UpdateUserAttributes([
