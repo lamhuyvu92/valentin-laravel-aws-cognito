@@ -119,12 +119,11 @@ class ApiGuard implements Guard
             throw new AuthenticationException();
         }
 
-        $cognitoUsername = $this->cognitoClient->verifyAccessToken($accessToken);
-
-        $this->user = $this->provider->retrieveByCredentials([
-            'username' => $cognitoUsername,
-        ]);
-        if($cognitoUsername){
+        $result = $this->cognitoClient->verifyAccessToken($accessToken);
+        if($result['status'] == "valid"){
+            $this->user = $this->provider->retrieveByCredentials([
+                'username' => $result['username'],
+            ]);
             return true;
         }
         return false;
@@ -148,11 +147,12 @@ class ApiGuard implements Guard
         $authenticationResponse->setRefreshToken(array_get($cognitoAuthenticationResponse, 'RefreshToken'));
         $authenticationResponse->setTokenType(array_get($cognitoAuthenticationResponse, 'TokenType'));
 
-        $cognitoUsername = $this->cognitoClient->verifyAccessToken($authenticationResponse->getAccessToken());
-
-        $this->user = $this->provider->retrieveByCredentials([
-            'username' => $cognitoUsername,
-        ]);
+        $result = $this->cognitoClient->verifyAccessToken($authenticationResponse->getAccessToken());
+        if($result['status'] == "valid"){
+            $this->user = $this->provider->retrieveByCredentials([
+                'username' => $result['username'],
+            ]);
+        }
         
         $this->cognitoAuthenticationResponse = $cognitoAuthenticationResponse;
         return $this->authenticationResponse = $authenticationResponse;
