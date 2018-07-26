@@ -55,6 +55,33 @@ class LaravelCognitoClient extends CognitoClient
         return ['status' => 'valid', 'username' => $jwtPayload['username']];
     }
     
+    /**
+     * @param string $username
+     * @param string $refreshToken
+     * @return string
+     * @throws Exception
+     */
+    public function refreshAuthentication($username, $refreshToken)
+    {
+        try {
+            $response = $this->client->adminInitiateAuth([
+                'AuthFlow' => 'REFRESH_TOKEN_AUTH',
+                'AuthParameters' => [
+                    // 'USERNAME' => $username,
+                    'REFRESH_TOKEN' => $refreshToken,
+                    // 'SECRET_HASH' => $this->cognitoSecretHash($username),
+                    'SECRET_HASH' => $this->appClientSecret,
+                ],
+                'ClientId' => $this->appClientId,
+                'UserPoolId' => $this->userPoolId,
+            ])->toArray();
+            
+            return $response['AuthenticationResult'];
+        } catch (CognitoIdentityProviderException $e) {
+            throw CognitoResponseException::createFromCognitoException($e);
+        }
+    }
+    
     public function test(){
         $result = $this->client->AdminGetUser([
                    "Username"=> "valentin2",
