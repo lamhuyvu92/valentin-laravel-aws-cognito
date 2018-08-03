@@ -10,11 +10,16 @@ use pmill\LaravelAwsCognito\LaravelCognitoClient;
 use pmill\AwsCognito\Exception\TokenExpiryException;
 use pmill\AwsCognito\Exception\TokenVerificationException;
 use pmill\LaravelAwsCognito\Exceptions\CognitoUserNotFoundException;
-
+use Aws\CognitoIdentity\CognitoIdentityClient;
 class ApiGuard implements Guard
 {
     use GuardHelpers;
 
+    /**
+     * @var CognitoIdentityClient
+     */
+    protected $cognitoIdentityClient;
+    
     /**
      * @var CognitoClient
      */
@@ -34,7 +39,7 @@ class ApiGuard implements Guard
      * @var cognitoAuthenticationResponse
      */
     protected $cognitoAuthenticationResponse;
-
+    
     /**
      * ApiGuard constructor.
      *
@@ -45,6 +50,11 @@ class ApiGuard implements Guard
     {
         $this->provider = $userProvider;
         $this->cognitoClient = $cognitoClient;
+        $this->cognitoIdentityClient = CognitoIdentityClient::factory(array(
+            'version' => config('aws-cognito-auth.version'),
+            'region'  => config('aws-cognito-auth.region'),
+            'credentials' => config('aws-cognito-auth.credentials')
+        ));
         $this->usernameField = config('aws-cognito-auth.username_field');
     }
 
@@ -226,5 +236,12 @@ class ApiGuard implements Guard
     
     public function test(){
         $this->cognitoClient->test();
+    }
+    
+    public function getIdentityId(){
+        $result = $this->cognitoIdentityClient->getId([
+            "IdentityPoolId" => config('aws-cognito-auth.identity_pool_id')
+        ]);
+        return $result->toArray();
     }
 }
