@@ -212,6 +212,23 @@ class ApiGuard implements Guard
         return $this->cognitoClient->registerUser($username, $password, $request);
     }
     
+    /**
+     * @param string $username
+     * @param string $password
+     * @param array $attributes
+     * @return string
+     * @throws Exception
+     */
+    public function AdminCreateUser($request = null)
+    {
+        $username = $request['username'];
+        $password = $request['password'];
+        unset($request['username']);
+        unset($request['password']);
+        unset($request['password_confirmation']);
+        return $this->cognitoClient->AdminCreateUser($username, $password, $request);
+    }
+    
     public function confirmUserRegistration($confirmationCode, $username)
     {
         $this->cognitoClient->confirmUserRegistration($confirmationCode, $username);

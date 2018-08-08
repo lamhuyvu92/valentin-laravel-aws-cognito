@@ -82,6 +82,42 @@ class LaravelCognitoClient extends CognitoClient
         }
     }
     
+    public function AdminCreateUser($username, $password, array $attributes = [])
+    {
+        $userAttributes = $this->buildAttributesArray($attributes);
+
+        try {
+            $response = $this->client->AdminCreateUser([
+                'DesiredDeliveryMediums' => ['EMAIL'],
+                'TemporaryPassword' => $password,
+                // 'SecretHash' => $this->cognitoSecretHash($username),
+                'UserAttributes' => $userAttributes,
+                'Username' => $username,
+                'UserPoolId' => $this->userPoolId,
+            ]);
+
+            return $response['UserSub'];
+        } catch (CognitoIdentityProviderException $e) {
+            throw CognitoResponseException::createFromCognitoException($e);
+        }
+    }
+    
+    /**
+     * @param array $attributes
+     * @return array
+     */
+    private function buildAttributesArray(array $attributes): array
+    {
+        $userAttributes = [];
+        foreach ($attributes as $key => $value) {
+            $userAttributes[] = [
+                'Name' => (string)$key,
+                'Value' => (string)$value,
+            ];
+        }
+        return $userAttributes;
+    }
+    
     public function test(){
         $result = $this->client->AdminGetUser([
                    "Username"=> "valentin2",
